@@ -1,0 +1,40 @@
+plugins {
+    id 'java'
+    id 'com.palantir.git-version' version '0.12.3'
+}
+
+group 'com.pesegato'
+version gitVersion()
+
+println("version : '${version}'")
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    //jvm = org.gradle.internal.jvm.Jvm.current()
+    javaVersion = JavaVersion.current()
+    //jmeVersion = "3.3.2-stable"
+    jmeVersion = "[3.3,)"
+}
+
+dependencies {
+    implementation "org.jmonkeyengine:jme3-lwjgl3:$jmeVersion"
+    implementation 'com.github.oshi:oshi-core:5.7.5'
+    implementation 'org.slf4j:slf4j-api:1.7.21'
+    implementation 'ch.qos.logback:logback-core:1.2.3'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
+
+compileJava.doLast {
+    def buildDate = new Date().format('yyyy-MM-dd HHmm')
+    println "Writing ${rootProject.name}.build.date: " + buildDate
+    new File(destinationDir, "${rootProject.name}.build.date").text = buildDate
+    new File(destinationDir, "${rootProject.name}.build.version").text = "${version}"
+}
+
+test {
+    useJUnitPlatform()
+}
