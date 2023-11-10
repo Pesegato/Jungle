@@ -1,10 +1,12 @@
 plugins {
     id 'java'
-    id 'maven-publish'    
-    id 'com.palantir.git-version' version '0.12.3'
+    id 'maven-publish'
+    id 'signing'
+    //id "com.vanniktech.maven.publish" version "0.25.3"
+    id 'com.palantir.git-version' version '3.0.0'
 }
 
-group 'com.pesegato'
+group 'io.github.pesegato'
 version gitVersion()
 
 println("version : '${version}'")
@@ -13,11 +15,68 @@ repositories {
     mavenCentral()
 }
 
+task javadocJar(type: Jar) {
+    archiveClassifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    archiveClassifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            pom {
+                name = 'Jungle'
+                description 'Environment support for jMonkeyEngine.'
+                url = 'https://github.com/Pesegato/Jungle/'
+                licenses {
+                    license {
+                        name = 'BSD 3-Clause License'
+                        url = 'https://github.com/Pesegato/Jungle/blob/main/LICENSE'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'pesegato'
+                        name = 'Pesegato Ameiurus Melas'
+                        email = 'pesegato@outlook.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/pesegato/jungle.git'
+                    developerConnection = 'scm:git:ssh://git@github.com/pesegato/jungle.git'
+                    url = 'https://github.com/Pesegato/Jungle/'
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            url "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username = ossrhUsername
+                password = ossrhPassword
+            }
+        }
+    }
+}
+/*
 publishing {
   repositories {
     maven {
       name = "GitHubPackages"
-      url = "https://maven.pkg.github.com/jPonyEngine/Jungle"
+      url = "https://maven.pkg.github.com/Pesegato/Jungle"
       credentials {
         username = System.getenv("GITHUB_ACTOR")
         password = System.getenv("GITHUB_TOKEN")
@@ -25,7 +84,7 @@ publishing {
     }
   }
 }
-
+*/
 ext {
     //jvm = org.gradle.internal.jvm.Jvm.current()
     javaVersion = JavaVersion.current()
