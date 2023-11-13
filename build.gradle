@@ -30,7 +30,7 @@ artifacts {
 }
 
 signing {
-    sign configurations.archives
+    sign publishing.publications
 }
 
 publishing {
@@ -38,7 +38,7 @@ publishing {
         mavenJava(MavenPublication) {
             pom {
                 name = 'Jungle'
-                description 'Environment support for jMonkeyEngine.'
+                description = 'Environment support for jMonkeyEngine.'
                 url = 'https://github.com/Pesegato/Jungle/'
                 licenses {
                     license {
