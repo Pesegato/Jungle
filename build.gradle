@@ -1,5 +1,5 @@
 plugins {
-    id 'java'
+    id 'java-library'
     id 'maven-publish'
     id 'signing'
     //id "com.vanniktech.maven.publish" version "0.25.3"
@@ -36,6 +36,7 @@ signing {
 publishing {
     publications {
         mavenJava(MavenPublication) {
+            from components.java
             pom {
                 name = 'Jungle'
                 description = 'Environment support for jMonkeyEngine.'
