@@ -38,6 +38,7 @@ publishing {
                 name = 'Jungle'
                 description = 'Environment support for jMonkeyEngine.'
                 url = 'https://github.com/Pesegato/Jungle/'
+                inceptionYear = '2022'
                 licenses {
                     license {
                         name = 'BSD 3-Clause License'
