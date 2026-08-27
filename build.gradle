@@ -1,101 +1,100 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
-    id 'signing'
-    id 'com.palantir.git-version' version '3.0.0'
+    id 'com.vanniktech.maven.publish' version '0.37.0'
+    id 'com.palantir.git-version' version '5.1.0'
 }
 
-group 'io.github.pesegato'
-version gitVersion()
+def gitDetails = versionDetails()
+def isSnapshot = !gitDetails.isCleanTag
 
-println("version : '${version}'")
+group = 'io.github.pesegato'
+//version = gitVersion()
+
+// Se siamo su un tag pulito → versione normale
+// Altrimenti → versione-SNAPSHOT
+version = isSnapshot
+        ? "${gitDetails.lastTag}-SNAPSHOT"
+        : gitDetails.lastTag
+
+println("version : '${version}'  (snapshot: ${isSnapshot})")
 
 repositories {
     mavenCentral()
 }
 
-task javadocJar(type: Jar) {
-    archiveClassifier = 'javadoc'
-    from javadoc
+java {
+    withJavadocJar()
+    withSourcesJar()
 }
 
-task sourcesJar(type: Jar) {
-    archiveClassifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-signing {
-    sign publishing.publications
-}
-
+// =====================================================
+// GitHub Packages
+// =====================================================
 publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-            artifact sourcesJar
-            artifact javadocJar
-            pom {
-                name = 'Jungle'
-                description = 'Environment support for jMonkeyEngine.'
-                url = 'https://github.com/Pesegato/Jungle/'
-                inceptionYear = '2022'
-                licenses {
-                    license {
-                        name = 'BSD 3-Clause License'
-                        url = 'https://github.com/Pesegato/Jungle/blob/main/LICENSE'
-                    }
-                }
-                developers {
-                    developer {
-                        id = 'pesegato'
-                        name = 'Pesegato Ameiurus Melas'
-                        email = 'pesegato@outlook.com'
-                    }
-                }
-                scm {
-                    connection = 'scm:git:git://github.com/pesegato/jungle.git'
-                    developerConnection = 'scm:git:ssh://git@github.com/pesegato/jungle.git'
-                    url = 'https://github.com/Pesegato/Jungle/'
-                }
-            }
-        }
-    }
     repositories {
         maven {
-            url "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/Pesegato/Jungle")
             credentials {
-                username = ossrhUsername
-                password = ossrhPassword
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
             }
         }
     }
 }
-/*
-publishing {
-  repositories {
-    maven {
-      name = "GitHubPackages"
-      url = "https://maven.pkg.github.com/Pesegato/Jungle"
-      credentials {
-        username = System.getenv("GITHUB_ACTOR")
-        password = System.getenv("GITHUB_TOKEN")
-      }
+
+// =====================================================
+// Maven Central (solo per le release stabili)
+// =====================================================
+mavenPublishing {
+    publishToMavenCentral(true)   // true = rilascia automaticamente
+    signAllPublications()
+
+    coordinates(group.toString(), 'jungle', version.toString())
+
+    pom {
+        name = 'Jungle'
+        description = 'Environment support for jMonkeyEngine.'
+        url = 'https://github.com/Pesegato/Jungle/'
+        inceptionYear = '2022'
+
+        licenses {
+            license {
+                name = 'BSD 3-Clause License'
+                url = 'https://github.com/Pesegato/Jungle/blob/main/LICENSE'
+                distribution = 'repo'
+            }
+        }
+
+        developers {
+            developer {
+                id = 'pesegato'
+                name = 'Pesegato Ameiurus Melas'
+                email = 'pesegato@outlook.com'
+            }
+        }
+
+        scm {
+            connection = 'scm:git:git://github.com/Pesegato/Jungle.git'
+            developerConnection = 'scm:git:ssh://git@github.com/Pesegato/Jungle.git'
+            url = 'https://github.com/Pesegato/Jungle/'
+        }
     }
-  }
 }
-*/
+
 ext {
-    //jvm = org.gradle.internal.jvm.Jvm.current()
     javaVersion = JavaVersion.current()
-    //jmeVersion = "3.3.2-stable"
-    jmeVersion = "[3.3,)"
+    jmeVersion = "3.6.1-stable"   // meglio una versione fissa invece di [3.3,)
 }
 
 dependencies {
     implementation "org.jmonkeyengine:jme3-lwjgl3:$jmeVersion"
     implementation 'com.github.oshi:oshi-core:6.4.8'
     implementation 'org.slf4j:slf4j-api:2.0.9'
-    implementation 'ch.qos.logback:logback-core:1.3.13'
+    implementation 'ch.qos.logback:logback-core:1.5.34'
+    implementation 'ch.qos.logback:logback-classic:1.5.34'   // aggiunto il binding
+
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 }
