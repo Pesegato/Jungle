@@ -1,10 +1,16 @@
-name: Publish Release (GitHub Packages)
+name: Publish to GitHub Packages
 
 on:
   push:
+    branches: [main]
     tags:
       - '*'
-      - '!*-SNAPSHOT'  # escludi tag che finiscono con -SNAPSHOT
+      - '!*-SNAPSHOT'
+  workflow_dispatch:
+
+concurrency:
+  group: github-packages
+  cancel-in-progress: false
 
 jobs:
   publish:
@@ -27,13 +33,26 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      - name: Publish Release to GitHub Packages
+      - name: Resolve version
+        id: ver
+        run: |
+          VERSION=$(./gradlew properties -q | awk '/^version:/ { print $2 }')
+          echo "version=$VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          if [[ "$VERSION" == *-SNAPSHOT ]]; then
+            echo "is_snapshot=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_snapshot=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish to GitHub Packages
         run: ./gradlew publishAllPublicationsToGitHubPackagesRepository
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
 
       - name: Delete SNAPSHOT versions from GitHub Packages
+        if: steps.ver.outputs.is_snapshot == 'false'
         uses: actions/delete-package-versions@v5
         with:
           owner: ${{ github.repository_owner }}
