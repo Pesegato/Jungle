@@ -56,7 +56,7 @@ jobs:
         uses: actions/delete-package-versions@v5
         with:
           owner: ${{ github.repository_owner }}
-          package-name: jungle
+          package-name: io.github.pesegato.jungle
           package-type: maven
           min-versions-to-keep: 0
           ignore-versions: '^(?!.*-SNAPSHOT$).+$'
