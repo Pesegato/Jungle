@@ -3,7 +3,7 @@ name: Publish Release (GitHub Packages)
 on:
   push:
     tags:
-      - 'v*'          # solo tag che iniziano con v
+      - '!*-SNAPSHOT'  # escludi tag che finiscono con -SNAPSHOT
 
 jobs:
   publish:
