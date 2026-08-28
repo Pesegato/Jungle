@@ -3,6 +3,7 @@ name: Publish Release (GitHub Packages)
 on:
   push:
     tags:
+      - '*'
       - '!*-SNAPSHOT'  # escludi tag che finiscono con -SNAPSHOT
 
 jobs:
@@ -34,3 +35,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
+
+      - name: Delete SNAPSHOT versions from GitHub Packages
+        uses: actions/delete-package-versions@v5
+        with:
+          owner: ${{ github.repository_owner }}
+          package-name: jungle
+          package-type: maven
+          min-versions-to-keep: 0
+          ignore-versions: '^(?!.*-SNAPSHOT$).+$'
