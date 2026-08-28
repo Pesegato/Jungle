@@ -45,7 +45,10 @@ publishing {
 // =====================================================
 mavenPublishing {
     publishToMavenCentral(true)   // true = rilascia automaticamente
-    signAllPublications()
+
+    if (providers.gradleProperty("signingInMemoryKey").isPresent()) {
+        signAllPublications()
+    }
 
     coordinates(group.toString(), 'jungle', version.toString())
 
