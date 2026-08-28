@@ -9,10 +9,6 @@ def gitDetails = versionDetails()
 def isSnapshot = !gitDetails.isCleanTag
 
 group = 'io.github.pesegato'
-//version = gitVersion()
-
-// Se siamo su un tag pulito → versione normale
-// Altrimenti → versione-SNAPSHOT
 version = isSnapshot
         ? "${gitDetails.lastTag}-SNAPSHOT"
         : gitDetails.lastTag
@@ -85,7 +81,7 @@ mavenPublishing {
 
 ext {
     javaVersion = JavaVersion.current()
-    jmeVersion = "3.6.1-stable"   // meglio una versione fissa invece di [3.3,)
+    jmeVersion = "3.6.1-stable"
 }
 
 dependencies {
@@ -101,4 +97,62 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+// =====================================================
+// Generazione di BuildInfo.java
+// =====================================================
+
+def buildInfoPackage = "io.github.pesegato.jungle"          // ← cambia se vuoi un altro package
+def buildInfoClass = "BuildInfo"
+
+tasks.register('generateBuildInfo') {
+    def outputDir = layout.buildDirectory.dir("generated/sources/build-info/java")
+
+    // Input: la versione del progetto
+    inputs.property("version", provider { version.toString() })
+
+    // Output: la directory dove viene generata la classe
+    outputs.dir(outputDir)
+
+    doLast {
+        def packagePath = buildInfoPackage.replace('.', '/')
+        def dir = outputDir.get().asFile
+        def packageDir = new File(dir, packagePath)
+        packageDir.mkdirs()
+
+        def buildDate = new Date().format("yyyy-MM-dd HH:mm")
+        def versionValue = version.toString()
+
+        def file = new File(packageDir, "${buildInfoClass}.java")
+        file.text = """\
+package ${buildInfoPackage};
+
+/**
+ * Informazioni di build generate automaticamente da Gradle.
+ * Non modificare questo file a mano.
+ */
+public final class ${buildInfoClass} {
+
+    public static final String VERSION = "${versionValue}";
+    public static final String BUILD_DATE = "${buildDate}";
+
+    private ${buildInfoClass}() {
+        // utility class
+    }
+}
+"""
+        println "Generated ${buildInfoClass}.java → version=${versionValue}, date=${buildDate}"
+    }
+}
+
+sourceSets {
+    main {
+        java.srcDir(generateBuildInfo.outputs)
+    }
+}
+
+// Assicurati che la generazione avvenga prima della compilazione
+tasks.named('compileJava') {
+    dependsOn('generateBuildInfo')
 }
