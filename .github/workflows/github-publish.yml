@@ -27,18 +27,6 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      - name: Make gradlew executable
-        run: chmod +x gradlew
-
-      - name: Debug git version state
-        run: |
-          git status --porcelain
-          echo "HEAD=$(git rev-parse HEAD)"
-          echo "describe=$(git describe --tags --always --first-parent --abbrev=7 HEAD)"
-          echo "tags on HEAD:"
-          git tag --points-at HEAD
-          git ls-files -s gradlew
-
       - name: Publish Release to GitHub Packages
         run: ./gradlew publishAllPublicationsToGitHubPackagesRepository
         env:
