@@ -6,12 +6,16 @@ plugins {
 }
 
 def gitDetails = versionDetails()
+
+// Github wants v1.0.0, Maven Central wants 1.0.0
+def rawTag = gitDetails.lastTag
+def cleanTag = (rawTag != null && rawTag.startsWith("v")) ? rawTag.substring(1) : rawTag
 def isSnapshot = !gitDetails.isCleanTag
 
 group = 'io.github.pesegato'
 version = isSnapshot
-        ? "${gitDetails.lastTag}-SNAPSHOT"
-        : gitDetails.lastTag
+        ? "${cleanTag}-SNAPSHOT"
+        : cleanTag
 
 println("version : '${version}'  (snapshot: ${isSnapshot})")
 
