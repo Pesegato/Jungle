@@ -44,9 +44,9 @@ publishing {
 // Maven Central (solo per le release stabili)
 // =====================================================
 mavenPublishing {
-    publishToMavenCentral(true)   // true = rilascia automaticamente
+    publishToMavenCentral(true)
 
-    if (providers.gradleProperty("signingInMemoryKey").isPresent()) {
+    if (project.hasProperty("signingInMemoryKey").isPresent()) {
         signAllPublications()
     }
 
