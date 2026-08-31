@@ -105,8 +105,8 @@ test {
 // Generazione di BuildInfo.java
 // =====================================================
 
-def buildInfoPackage = "io.github.pesegato.jungle"          // ← cambia se vuoi un altro package
-def buildInfoClass = "BuildInfo"
+def buildInfoPackage = "io.github.pesegato." + rootProject.name.toLowerCase()
+def buildInfoClass = "${rootProject.name}BuildInfo"
 
 tasks.register('generateBuildInfo') {
     def outputDir = layout.buildDirectory.dir("generated/sources/build-info/java")
