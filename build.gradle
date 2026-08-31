@@ -46,7 +46,7 @@ publishing {
 mavenPublishing {
     publishToMavenCentral(true)
 
-    if (project.hasProperty("signingInMemoryKey") || providers.gradleProperty("signingInMemoryKey").isPresent()) {
+    if (file("/tmp/secring.gpg").exists()) {
         signAllPublications()
     }
 
