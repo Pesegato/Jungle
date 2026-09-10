@@ -7,6 +7,8 @@
 
 </div>
 
+<div align="center"><img alt="Jungle Logo" src="jungle-logo.png" align="center">
+
 ## Instructions
 
 Features:
