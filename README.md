@@ -2,8 +2,8 @@
 
  # Environment support for jMonkeyEngine 3
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.pesegato/Jungle?style=for-the-badge)](https://central.sonatype.com/artifact/io.github.pesegato/Jungle) 
-[![javadoc](https://javadoc.io/badge2/io.github.pesegato/Jungle/javadoc.svg?style=for-the-badge)](https://javadoc.io/doc/io.github.pesegato/Jungle) 
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.pesegato/jungle?style=for-the-badge)](https://central.sonatype.com/artifact/io.github.pesegato/jungle) 
+[![javadoc](https://javadoc.io/badge2/io.github.pesegato/jungle/javadoc.svg?style=for-the-badge)](https://javadoc.io/doc/io.github.pesegato/jungle) 
 
 </div>
 
