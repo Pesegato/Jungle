@@ -16,3 +16,58 @@
 Features:
 * Provides a folder for saving games, settings and logs (on Windows is on the "SavedGames" system folder).
 * Shows system information
+
+## Example
+
+```java
+import io.github.pesegato.jungle.Environment;
+import java.nio.file.Path;
+import java.nio.file.Files;
+
+public class JungleExample {
+    static Logger log = LoggerFactory.getLogger(JungleExample.class);
+
+    public static void main(String[] args) throws Exception {
+        Environment.init(log);
+        log.info(Environment.getRendererFriendlyName());
+        log.info(Environment.getOSFriendlyName());
+        log.info(Environment.getJavaFriendlyName());
+        
+        save("slot 1");
+    }
+    
+    public static String getPathOfSlot(String name) {
+        return Environment.getGameFolder() + "/slots/" + name + ".json";
+    }
+    
+    public void save() {
+        Writer writer = null;
+        try {
+            log.info("SAVE DATA {}", name);
+            writer = new FileWriter(getPathOfSlot(name));
+            //GSON example
+            //new Gson().toJson(this, writer);
+        } catch (IOException ex) {
+            log.error(null, ex);
+        } finally {
+            try {
+                writer.close();
+            } catch (IOException ex) {
+                log.error(null, ex);
+            }
+        }
+    }
+    
+    public static void load(String name) {
+        try {
+            Reader reader = null;
+            log.info("LOAD DATA {}", name);
+            reader = new FileReader(getPathOfSlot(name));
+            //custom logic...
+            reader.close();
+        } catch (IOException ex) {
+            log.error(null, ex);
+        }
+    }
+}
+```
