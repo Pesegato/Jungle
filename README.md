@@ -20,54 +20,35 @@ Features:
 ## Example
 
 ```java
-import io.github.pesegato.jungle.Environment;
-import java.nio.file.Path;
+import com.pesegato.jungle.Environment;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class JungleExample {
-    static Logger log = LoggerFactory.getLogger(JungleExample.class);
+    public static void main(String[] args) throws IOException {
+        // Set this once, before asking for game/settings paths.
+        Environment.setGameFolderName("JungleExample");
+        System.out.println(Environment.getJavaFriendlyName());
+        save("slot 1", "{\"level\":1}");
+        System.out.println(load("slot 1"));
+    }
 
-    public static void main(String[] args) throws Exception {
-        Environment.init(log);
-        log.info(Environment.getRendererFriendlyName());
-        log.info(Environment.getOSFriendlyName());
-        log.info(Environment.getJavaFriendlyName());
-        
-        save("slot 1");
+    public static Path getPathOfSlot(String name) {
+        return Path.of(Environment.getGameFolder(), "slots", name + ".json");
     }
-    
-    public static String getPathOfSlot(String name) {
-        return Environment.getGameFolder() + "/slots/" + name + ".json";
+
+    public static void save(String name, String json) throws IOException {
+        Path slot = getPathOfSlot(name);
+        Files.createDirectories(slot.getParent());
+        Files.writeString(slot, json, StandardCharsets.UTF_8);
     }
-    
-    public void save() {
-        Writer writer = null;
-        try {
-            log.info("SAVE DATA {}", name);
-            writer = new FileWriter(getPathOfSlot(name));
-            //GSON example
-            //new Gson().toJson(this, writer);
-        } catch (IOException ex) {
-            log.error(null, ex);
-        } finally {
-            try {
-                writer.close();
-            } catch (IOException ex) {
-                log.error(null, ex);
-            }
-        }
-    }
-    
-    public static void load(String name) {
-        try {
-            Reader reader = null;
-            log.info("LOAD DATA {}", name);
-            reader = new FileReader(getPathOfSlot(name));
-            //custom logic...
-            reader.close();
-        } catch (IOException ex) {
-            log.error(null, ex);
-        }
+
+    public static String load(String name) throws IOException {
+        return Files.readString(getPathOfSlot(name), StandardCharsets.UTF_8);
     }
 }
 ```
+
+`Environment.init(logger)` also collects GPU information and calls OpenGL. Invoke it on your running jME rendering thread with an active OpenGL context, for example inside `simpleInitApp()`, before using `getRendererFriendlyName()` or `getOSFriendlyName()`. The file example above does not need an OpenGL context. Use trusted slot names; validate user-supplied names before using them as paths.
